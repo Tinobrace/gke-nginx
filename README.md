@@ -1,7 +1,6 @@
 # 🚀 Deploying Nginx on Kubernetes (GKE & Minikube)  
 
 This project demonstrates how to **deploy an Nginx web server on Kubernetes**, using either **Google Kubernetes Engine (GKE)** or **Minikube**.  
-
 ---
 
 ## **🎯 Project Overview**  
