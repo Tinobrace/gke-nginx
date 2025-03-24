@@ -1,35 +1,46 @@
-name: Deploy to GKE
+name: Deploy Application  # Correctly formatted workflow name
 
 on:
   push:
     branches:
-      - main
+      - main  # Ensure indentation is correct
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-latest  # Ensuring proper spacing
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Authenticate with GCP
-      uses: google-github-actions/auth@v1
-      with:
-        credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Set up Google Cloud SDK
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y apt-transport-https ca-certificates gnupg curl
+          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmour -o /usr/share/keyrings/cloud.google.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+          sudo apt-get update -y
+          sudo apt-get install -y google-cloud-sdk google-cloud-sdk-gke-gcloud-auth-plugin kubectl
 
-    - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
+      - name: Authenticate with GCP using Service Account
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          echo "$GCP_SA_KEY" > gcp-key.json
+          gcloud auth activate-service-account --key-file=gcp-key.json
+          gcloud config set project k8s-cluster-454422
+          gcloud auth list  # Verify authentication
 
-    - name: Get GKE Credentials
-      run: gcloud container clusters get-credentials my-gke-cluster --region=us-central1-a
+      - name: Connect to GKE Cluster
+        run: |
+          gcloud container clusters get-credentials my-gke-cluster --zone us-central1-a --project k8s-cluster-454422
+          kubectl cluster-info  # Verify connection
 
-    - name: Install GKE Auth Plugin
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
+      - name: Deploy to GKE
+        run: |
+          kubectl apply -f k8s/nginx-deployment.yml
+          kubectl apply -f k8s/nginx-service.yml
 
-    - name: Deploy to GKE
-      run: |
-        kubectl apply -f nginx-deployment.yml
-        kubectl apply -f nginx-service.yml
+      - name: Verify Deployment
+        run: |
+          kubectl get pods
+          kubectl get services
