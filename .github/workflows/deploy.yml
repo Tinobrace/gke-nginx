@@ -23,5 +23,5 @@ jobs:
 
     - name: Deploy to GKE
       run: |
-        kubectl apply -f k8s/nginx-deployment.yml
-        kubectl apply -f k8s/nginx-service.yml
+        kubectl apply -f nginx-deployment.yml
+        kubectl apply -f nginx-service.yml
