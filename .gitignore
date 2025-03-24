@@ -1,3 +1,4 @@
 minikube-linux-amd64
 yes/google-cloud-sdk/platform/bundledpythonunix/lib/libpython3.12.a
 yes/google-cloud-sdk/platform/bundledpythonunix/lib/libpython3.12.so
+gcp-key.json
