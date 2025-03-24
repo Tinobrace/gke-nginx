@@ -19,7 +19,7 @@ jobs:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
 
     - name: Get GKE Credentials
-      run: gcloud container clusters get-credentials YOUR_EXISTING_CLUSTER_NAME --region=YOUR_CLUSTER_REGION
+      run: gcloud container clusters get-credentials my-gke-cluster --region=us-central1-a
 
     - name: Deploy to GKE
       run: |
